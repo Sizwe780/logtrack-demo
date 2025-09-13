@@ -7,7 +7,7 @@ const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2l6d2U3OCIsImEiOiJjbWZncWkwZnIwNDBtMmtxd3BkeXV
 
 function TripList() {
   const [trips, setTrips] = useState([]);
-  const [stopRemarksMap, setStopRemarksMap] = useState({}); // ✅ Store remarks per trip
+  const [stopRemarksMap, setStopRemarksMap] = useState({}); //Store remarks per trip
 
   const geocodeLocation = async (location) => {
     if (!location) return null;
