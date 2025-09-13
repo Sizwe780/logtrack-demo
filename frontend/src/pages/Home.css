@@ -1,0 +1,102 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+}
+
+.home-container {
+  padding-top: 100px;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.welcome-message {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.form-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.form-title {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.trip-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start; /* Aligns inputs to the top of the row */
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+input {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  height: 40px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.location-indicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-top: 4px;
+}
+
+.location-indicator.success {
+  background-color: #94d82d;
+}
+
+.location-indicator.error {
+  background-color: #f03e3e;
+}
+
+.submit-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start; /* Aligns button to the top */
+  margin-top: 1rem; /* No negative margin needed */
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  padding: 0.6rem 1rem;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 120px;
+}
+
+.contact-footer {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 14px;
+  color: #555;
+}
