@@ -1,26 +1,24 @@
 FROM python:3.11
 
-# Set the working directory to the project root in the container.
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy the requirements file and install dependencies first for better caching.
+# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the project files into the container.
+# Copy everything from repo root
 COPY . .
 
-# Run Django commands. The `migrate` command is now configured to handle the database
-# URL correctly via a direct environment variable.
-RUN DATABASE_URL=sqlite:///db.sqlite3 python manage.py collectstatic --noinput
-RUN DATABASE_URL=sqlite:///db.sqlite3 python manage.py migrate
+# Collect static files and run migrations
+RUN python manage.py collectstatic --noinput
+RUN python manage.py makemigrations trips
+RUN python manage.py migrate
 
-# Expose the port for Gunicorn.
+# Expose the port that Gunicorn is listening on
 EXPOSE 8080
 
-# The entrypoint script is also copied and made executable.
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Start the application.
-ENTRYPOINT ["/bin/sh", "entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
