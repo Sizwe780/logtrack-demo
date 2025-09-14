@@ -2,15 +2,16 @@ import os
 import dj_database_url
 from pathlib import Path
 
+# Correct BASE_DIR to point to backend/
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Use environment variable for security
+# Secure secret key from environment
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-%jb+&zm0n=%2fstn2jutcu!ttsqzhhg)&&*%rgn8%u2ri1&iqe')
 
 # Toggle debug via environment
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Allow Railway and Netlify domains
+# Explicit allowed hosts
 ALLOWED_HOSTS = [
     'logtrack-demo-production.up.railway.app',
     'logtracking.netlify.app',
@@ -40,9 +41,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "https://logtracking.netlify.app",
-]
+# Clean CORS setup
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'backend.core.urls'
 
@@ -61,9 +61,10 @@ TEMPLATES = [
     },
 ]
 
+# Correct WSGI path
 WSGI_APPLICATION = 'backend.core.wsgi.application'
 
-# Use Railway's PostgreSQL if available
+# SQLite fallback with Railway PostgreSQL override
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -74,12 +75,6 @@ DATABASES = {
 db_from_env = dj_database_url.config(conn_max_age=600)
 if db_from_env:
     DATABASES['default'].update(db_from_env)
-
-# CORS setup
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = [
-    "https://logtracking.netlify.app",
-]
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -93,6 +88,7 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# Static files setup for Railway
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
