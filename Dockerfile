@@ -1,18 +1,12 @@
 FROM python:3.11
 
-# Set working directory
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt /app/
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy only the backend contents
-COPY backend/manage.py /app/
-COPY backend/core /app/core
-COPY backend/trips /app/trips
+COPY backend/. .
 
-# Collect static files and run migrations
 RUN python manage.py collectstatic --noinput
 RUN python manage.py migrate
 
