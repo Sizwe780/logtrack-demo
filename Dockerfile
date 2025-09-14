@@ -9,8 +9,8 @@ COPY . .
 # Set the new working directory to the 'backend' folder
 WORKDIR /app/backend
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install dependencies from the requirements file in the root
+RUN pip install --no-cache-dir -r ../requirements.txt
 
 # Run migrations and collect static files
 RUN python manage.py migrate --noinput
