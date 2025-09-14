@@ -9,13 +9,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-%jb+&zm0n=%2fstn2jutcu!ttsqzhhg)&&*%rgn8%u2ri1&iqe')
 
 # Toggle debug via environment
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
 # Explicit allowed hosts
-
 ALLOWED_HOSTS = [ '*'
-    #'logtrack-demo-production.up.railway.app',
-    #'logtracking.netlify.app',
+ #'logtrack-demo-production.up.railway.app',
+ #'logtracking.netlify.app',
 ]
 
 INSTALLED_APPS = [
@@ -57,7 +56,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-            ],
+         ],
         },
     },
 ]
@@ -95,3 +94,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Add this basic logging configuration for debugging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
