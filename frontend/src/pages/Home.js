@@ -130,7 +130,8 @@ function Home({ setActiveTab }) {
       </div>
 
       <div className="contact-footer">
-        Reach out... sizwe.ngwenya78@gmail.com
+        <h3>Reach out... </h3>
+        sizwe.ngwenya78@gmail.com
       </div>
     </div>
   );
