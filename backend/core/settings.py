@@ -131,9 +131,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS Headers configuration
 # This allows the frontend to make API requests to your Django backend.
-CORS_ALLOWED_ORIGINS = os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',')
-if not CORS_ALLOWED_ORIGINS:
-    CORS_ALLOWED_ORIGINS = []
+# We are hardcoding this for now to get your app running.
+CORS_ALLOWED_ORIGINS = [
+    "https://logtracking.netlify.app",
+    # You can add more domains here if needed
+]
     
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
