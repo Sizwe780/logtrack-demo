@@ -11,7 +11,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Collect static files and run migrations
+# This step is crucial for production deployments
 RUN python manage.py collectstatic --noinput
+
+# The next two commands will create and apply the database migrations
 RUN python manage.py makemigrations trips
 RUN python manage.py migrate
 
