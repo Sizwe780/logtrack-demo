@@ -1,10 +1,6 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import TripViewSet
-
-router = DefaultRouter()
-router.register(r'trips', TripViewSet)
+from django.urls import path
+from .views import create_trip
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('', create_trip, name='create_trip'),
 ]

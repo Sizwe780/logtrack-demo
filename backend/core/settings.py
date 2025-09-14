@@ -41,6 +41,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CORS_ALLOWED_ORIGINS = [
+    "https://logtracking.netlify.app",
+]
+
 ROOT_URLCONF = 'backend.core.urls'
 
 TEMPLATES = [

@@ -1,8 +1,9 @@
-from django.shortcuts import render
-from rest_framework import viewsets
-from .models import Trip
-from .serializers import TripSerializer
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
-class TripViewSet(viewsets.ModelViewSet):
-    queryset = Trip.objects.all()
-    serializer_class = TripSerializer
+@api_view(['POST'])
+def create_trip(request):
+    data = request.data
+    # Validate and save logic here
+    return Response({"message": "Trip created"}, status=status.HTTP_201_CREATED)
