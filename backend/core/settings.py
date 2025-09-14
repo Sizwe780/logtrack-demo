@@ -9,7 +9,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "your-secret-key-here")
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1").split()
+# Get ALLOWED_HOSTS from environment variable, split by commas, and add Railway's health check host.
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1").split(',') + ['healthcheck.railway.app']
 
 # Application definition
 INSTALLED_APPS = [
