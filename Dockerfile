@@ -1,25 +1,25 @@
 FROM python:3.11
 
-# Set the working directory to the project root in the container.
-WORKDIR /app
+# Set the working directory to the root of your Django project.
+WORKDIR /app/backend
 
 # Copy the requirements file and install dependencies first for better caching.
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy the entire project into the container's /app directory.
-COPY . .
+# Copy the entire project into the container's working directory.
+COPY . /app
 
-# Run Django commands using the correct path.
-RUN python backend/manage.py collectstatic --noinput
-RUN python backend/manage.py migrate
+# The commands now directly reference the files within the working directory.
+RUN python manage.py collectstatic --noinput
+RUN python manage.py migrate
 
 # Expose the port for Gunicorn.
 EXPOSE 8080
 
-# Copy and make the entrypoint script executable.
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
+# The entrypoint script is also copied and made executable.
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 # Start the application.
-ENTRYPOINT ["/bin/sh", "entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]
