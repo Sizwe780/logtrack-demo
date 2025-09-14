@@ -1,11 +1,19 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import viewsets
+from .models import Trip
+from .serializers import TripSerializer
 
-@api_view(['POST'])
-def create_trip(request):
-    data = request.data
-    print("Incoming trip data:", data)  # This will show in Railway logs
-    # You can add validation and saving logic here
-    
-    return Response({"message": "Trip created"}, status=status.HTTP_201_CREATED)
+class TripViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for handling CRUD operations on Trip objects.
+    This will automatically handle GET (list/retrieve), POST, PUT, and DELETE.
+    """
+    queryset = Trip.objects.all().order_by('-departure_time')
+    serializer_class = TripSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Overrides the default create method to add a print statement
+        for debugging, which will show in your Railway logs.
+        """
+        print("Incoming trip data:", request.data)
+        return super().create(request, *args, **kwargs)

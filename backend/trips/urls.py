@@ -1,8 +1,12 @@
-from django.urls import path
-from .views import create_trip
+from rest_framework import routers
+from .views import TripViewSet
 
-urlpatterns = [
-    # The URL for creating a new trip.
-    # The path has been corrected to "trips/" to match the frontend request.
-    path('trips/', create_trip, name='create_trip'),
-]
+# Create a router for the TripViewSet
+router = routers.DefaultRouter()
+router.register(r'trips', TripViewSet)
+
+# The API URLs are now determined automatically by the router.
+# This single line handles:
+# /trips/ (GET for list, POST for create)
+# /trips/<id>/ (GET for detail, PUT/PATCH for update, DELETE for delete)
+urlpatterns = router.urls
