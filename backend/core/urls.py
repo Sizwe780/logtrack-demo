@@ -33,5 +33,6 @@ urlpatterns = [
     path('', root_view, name='root-view'),
     
     # This line includes the URL patterns from your trips app under the 'api/' prefix.
-    path('api/', include('trips.urls')),
+    # The path has been corrected to use the full Python path.
+    path('api/', include('backend.trips.urls')),
 ]
