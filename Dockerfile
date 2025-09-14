@@ -1,5 +1,5 @@
-# Use the official Python image
-FROM python:3.11-slim
+# Stage 1: Build dependencies
+FROM python:3.11-slim as builder
 
 # Set the working directory
 WORKDIR /app
@@ -8,12 +8,25 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Stage 2: Final image
+FROM python:3.11-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the installed dependencies from the builder stage
+COPY --from=builder /app /app
+
 # Copy the entire project
 COPY . .
 
+# Run migrations and collect static files
+RUN python manage.py migrate --noinput
+RUN python manage.py collectstatic --noinput
+
 # Expose the port
-EXPOSE 8080
+EXPOSE 8000
 
 # Command to run the application
-# It will run migrations and then start the Gunicorn server
-CMD python manage.py migrate --noinput && gunicorn backend.core.wsgi:application --chdir backend --bind 0.0.0.0:${PORT:-8080}
+# It will start the Gunicorn web server
+CMD ["gunicorn", "backend.core.wsgi:application", "--bind", "0.0.0.0:8000"]
