@@ -4,11 +4,13 @@ FROM python:3.11
 WORKDIR /app
 
 # Install dependencies
-COPY requirements.txt .
+COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend contents directly into /app
-COPY backend/. .
+# Copy only the backend contents
+COPY backend/manage.py /app/
+COPY backend/core /app/core
+COPY backend/trips /app/trips
 
 # Collect static files and run migrations
 RUN python manage.py collectstatic --noinput
