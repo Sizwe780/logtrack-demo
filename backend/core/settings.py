@@ -2,7 +2,7 @@ import os
 import dj_database_url
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Use environment variable for security
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-%jb+&zm0n=%2fstn2jutcu!ttsqzhhg)&&*%rgn8%u2ri1&iqe')
@@ -12,9 +12,8 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Allow Railway and Netlify domains
 ALLOWED_HOSTS = [
-    'railway.app',
+    'logtrack-demo-production.up.railway.app',
     'logtracking.netlify.app',
-    os.environ.get('ALLOWED_HOST', '')
 ]
 
 INSTALLED_APPS = [
@@ -62,7 +61,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+WSGI_APPLICATION = 'backend.core.wsgi.application'
 
 # Use Railway's PostgreSQL if available
 DATABASES = {
