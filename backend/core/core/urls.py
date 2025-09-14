@@ -6,6 +6,10 @@ import logging
 # Set up a logger for your application
 logger = logging.getLogger(__name__)
 
+# A simple view for the root URL.
+def root_view(request):
+    return HttpResponse("Welcome to Logtrack!", status=200)
+
 # A simple view for a health check. This function will be called when
 # a request is made to the '/health/' endpoint.
 def health_check(request):
@@ -13,6 +17,8 @@ def health_check(request):
     return HttpResponse("OK", status=200)
 
 urlpatterns = [
+    # Add a new URL pattern for the root URL.
+    path('', root_view, name='root'),
     # Add a new URL pattern for the health check.
     path('health/', health_check, name='health_check'),
     path('admin/', admin.site.urls),
