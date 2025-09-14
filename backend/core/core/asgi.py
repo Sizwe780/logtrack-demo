@@ -1,5 +1,5 @@
 """
-ASGI config for core project.
+ASGI config for backend project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,7 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
+# Use the full Python path to the settings module
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.core.settings')
 
 application = get_asgi_application()

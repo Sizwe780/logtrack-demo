@@ -2,10 +2,13 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-
+import logging
 
 def main():
     """Run administrative tasks."""
+    # Ensure the project's root directory is on the Python path
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'backend')))
+
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.core.settings')
     try:
         from django.core.management import execute_from_command_line

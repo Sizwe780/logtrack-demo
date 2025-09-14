@@ -1,23 +1,25 @@
 FROM python:3.11
 
-# Set working directory inside the container
+# Set the working directory to the project root in the container
 WORKDIR /app
 
-# Install dependencies
+# Copy the requirements file and install dependencies first for better caching
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy everything from repo root
+# Copy the entire project into the container's /app directory
 COPY . .
 
-# Collect static files and run migrations
-RUN python manage.py collectstatic --noinput
-RUN python manage.py migrate
+# Run Django commands from the correct directory, specifying the nested manage.py
+RUN python backend/manage.py collectstatic --noinput
+RUN python backend/manage.py migrate
 
-# Expose the port that Gunicorn is listening on
+# Expose the port for Gunicorn
 EXPOSE 8080
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Copy and make the entrypoint script executable
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+# Start the application
+ENTRYPOINT ["/bin/sh", "entrypoint.sh"]
