@@ -1,5 +1,8 @@
 #!/bin/bash
-# Use Railway's dynamic port or fallback to 8080 for consistency with Dockerfile
+set -e
+echo "Applying database migrations..."
+
+python manage.py migrate --noinput
 PORT=${PORT:-8080}
 
 echo "Starting Gunicorn on port $PORT..."
