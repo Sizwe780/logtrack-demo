@@ -16,5 +16,8 @@ python manage.py migrate --noinput
 PORT=${PORT:-8080}
 
 echo "Starting Gunicorn on port $PORT..."
+sleep 5
+
+
 # Start Gunicorn with the correct application path and bind address
 exec gunicorn backend.core.wsgi:application --chdir backend --bind 0.0.0.0:$PORT
