@@ -12,8 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Run Django commands using the correct path from the working directory.
-RUN python backend/manage.py collectstatic --noinput
-RUN python backend/manage.py migrate
+RUN python manage.py collectstatic --noinput
+RUN python manage.py migrate
 
 # Expose the port for Gunicorn.
 EXPOSE 8080
