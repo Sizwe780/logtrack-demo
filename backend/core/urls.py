@@ -1,6 +1,7 @@
-from django.urls import path
-from .views import create_trip
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
-    path('trips/', create_trip, name='create_trip'),
+    path('admin/', admin.site.urls),
+    path('api/', include('backend.trips.urls')),
 ]
