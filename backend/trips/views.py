@@ -1,19 +1,27 @@
 from rest_framework import viewsets
+from rest_framework.response import Response
 from .models import Trip
 from .serializers import TripSerializer
+import logging
+
+# Set up a logger for this module
+logger = logging.getLogger(__name__)
 
 class TripViewSet(viewsets.ModelViewSet):
     """
-    A viewset for handling CRUD operations on Trip objects.
-    This will automatically handle GET (list/retrieve), POST, PUT, and DELETE.
+    A ViewSet for handling API requests for Trip objects.
+    This provides `create`, `retrieve`, `update`, `partial_update`, and `destroy` actions.
     """
-    queryset = Trip.objects.all().order_by('-departure_time')
+    queryset = Trip.objects.all()
     serializer_class = TripSerializer
 
     def create(self, request, *args, **kwargs):
         """
-        Overrides the default create method to add a print statement
-        for debugging, which will show in your Railway logs.
+        Custom create method to handle incoming POST requests and save new trips.
         """
-        print("Incoming trip data:", request.data)
-        return super().create(request, *args, **kwargs)
+        logger.info(f"Incoming trip data: {request.data}")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        logger.info("Successfully created new trip.")
+        return Response(serializer.data, status=201)
