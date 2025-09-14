@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'backend.trips',
     'rest_framework',
+    'corsheaders',  # Add corsheaders to installed apps
 ]
 
 MIDDLEWARE = [
@@ -32,6 +33,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Add CORS middleware
 ]
 
 ROOT_URLCONF = 'backend.core.urls'
@@ -93,6 +95,11 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# CORS configuration
+CORS_ALLOWED_ORIGINS = [
+    "https://logtracking.netlify.app",  # Add your frontend URL
+]
+
 # Logging configuration
 LOGGING = {
     'version': 1,
@@ -121,8 +128,3 @@ LOGGING = {
         },
     },
 }
-
-# Add RAILWAY_STATIC_URL to ALLOWED_HOSTS if it exists.
-# We get it from a new environment variable from your Railway project.
-if os.environ.get('RAILWAY_STATIC_URL'):
-    ALLOWED_HOSTS.append(os.environ.get('RAILWAY_STATIC_URL'))
