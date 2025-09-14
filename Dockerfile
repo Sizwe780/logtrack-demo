@@ -1,14 +1,16 @@
 FROM python:3.11-slim
 
 # Set the working directory to the 'backend' directory
+WORKDIR /app
+
+# Copy the entire project into the container
+COPY . .
+
+# Set the new working directory to the 'backend' folder
 WORKDIR /app/backend
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt .
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the entire backend project into the container
-COPY ./backend .
 
 # Run migrations and collect static files
 RUN python manage.py migrate --noinput
