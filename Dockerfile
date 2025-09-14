@@ -7,8 +7,8 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy Django project files from backend folder
-COPY backend/ .
+# Copy backend contents directly into /app
+COPY backend/. .
 
 # Collect static files and run migrations
 RUN python manage.py collectstatic --noinput
