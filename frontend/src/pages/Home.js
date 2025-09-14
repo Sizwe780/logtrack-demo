@@ -36,7 +36,7 @@ function Home({ setActiveTab }) {
     };
 
     try {
-      await axios.post('http://127.0.0.1:8000/api/trips/', tripData);
+      await axios.post('https://logtrack-demo-production.up.railway.app/api/trips/', tripData);
       alert('Trip submitted successfully!');
       console.log('Trip submitted:', tripData);
 

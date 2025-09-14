@@ -26,7 +26,7 @@ function TripList() {
 
   const fetchTrips = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:8000/api/trips/');
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/trips/`);
       const enrichedTrips = await Promise.all(
         res.data.map(async (trip) => {
           const originCoords = await geocodeLocation(trip.origin);
