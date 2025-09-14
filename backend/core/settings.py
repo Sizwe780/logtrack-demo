@@ -4,13 +4,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ✅ Use environment variable for security
+# Use environment variable for security
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-%jb+&zm0n=%2fstn2jutcu!ttsqzhhg)&&*%rgn8%u2ri1&iqe')
 
-# ✅ Toggle debug via environment
+# Toggle debug via environment
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# ✅ Allow Railway and Netlify domains
+# Allow Railway and Netlify domains
 ALLOWED_HOSTS = [
     'railway.app',
     'logtracking.netlify.app',
@@ -60,7 +60,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
-# ✅ Use Railway's PostgreSQL if available
+# Use Railway's PostgreSQL if available
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -72,7 +72,7 @@ db_from_env = dj_database_url.config(conn_max_age=600)
 if db_from_env:
     DATABASES['default'].update(db_from_env)
 
-# ✅ CORS setup
+# CORS setup
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "https://logtracking.netlify.app",
