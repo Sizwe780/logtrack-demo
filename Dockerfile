@@ -1,4 +1,3 @@
-# Use the official Python image
 FROM python:3.11-slim
 
 # Set the working directory to the 'backend' directory
@@ -8,8 +7,8 @@ WORKDIR /app/backend
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the entire project
-COPY . .
+# Copy the entire backend project into the container
+COPY ./backend .
 
 # Run migrations and collect static files
 RUN python manage.py migrate --noinput
@@ -19,5 +18,4 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 8000
 
 # Command to run the application
-# This command explicitly adds the current directory to the Python path
-CMD ["gunicorn", "--chdir", "backend", "core.wsgi:application", "--bind", " "0.0.0.0:8000"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "core.wsgi:application"]
