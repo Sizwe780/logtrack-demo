@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 # a request is made to the '/health/' endpoint.
 def health_check(request):
     """
-    Handles health check requests for deployment platforms.
+    Handles health check requests from Railway.
     """
     logger.info("Health check request received. Returning 200 OK.")
     return HttpResponse("OK", status=200)
@@ -26,7 +26,7 @@ urlpatterns = [
     # The URL pattern for your Django admin site
     path('admin/', admin.site.urls),
     
-    # This is the URL pattern for your health check
+    # This is the URL pattern for your Railway health check
     path('health/', health_check, name='health_check'),
 
     # This is the URL pattern for your root domain
@@ -34,5 +34,5 @@ urlpatterns = [
     
     # This line includes the URL patterns from your trips app under the 'api/' prefix.
     # The path has been corrected to use the full Python path.
-    path('api/', include('trips.urls')),
+    path('api/', include('backend.trips.urls')),
 ]
