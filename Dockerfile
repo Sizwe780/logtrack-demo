@@ -2,13 +2,17 @@ FROM python:3.11
 
 WORKDIR /app
 
+# Copy requirements and install
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY backend/ .  # ✅ Copy Django project files
+# Copy backend folder into container
+COPY backend/ ./backend
 
-WORKDIR /app/backend  # ✅ Set working directory to where manage.py lives
+# Set working directory to backend (where manage.py lives)
+WORKDIR /app/backend
 
+# Collect static files and run migrations
 RUN python manage.py collectstatic --noinput
 RUN python manage.py migrate
 
