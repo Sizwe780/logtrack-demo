@@ -1,5 +1,15 @@
 #!/bin/bash
 set -e
+echo "Waiting for PostgreSQL to become available..."
+
+until psql $DATABASE_URL -c '\q'; do
+
+&2 echo "Postgres is unavailable - sleeping"
+sleep 1
+done
+
+&2 echo "Postgres is up - executing command"
+
 echo "Applying database migrations..."
 
 python manage.py migrate --noinput
