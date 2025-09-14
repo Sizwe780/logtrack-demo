@@ -12,9 +12,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-%jb+&zm0n=%2fstn2jutc
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Explicit allowed hosts
-ALLOWED_HOSTS = [
-    'logtrack-demo-production.up.railway.app',
-    'logtracking.netlify.app',
+
+ALLOWED_HOSTS = [ '*'
+    #'logtrack-demo-production.up.railway.app',
+    #'logtracking.netlify.app',
 ]
 
 INSTALLED_APPS = [
