@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # Your apps here
     # The correct path to your app is 'backend.trips'
     'backend.trips',
+    'trips',
 ]
 
 MIDDLEWARE = [
