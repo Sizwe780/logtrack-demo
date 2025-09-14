@@ -1,20 +1,23 @@
-from pathlib import Path
 import os
+from pathlib import Path
 import dj_database_url
+import sys
+from datetime import date
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+
 SECRET_KEY = os.environ.get("SECRET_KEY", "your-secret-key-here")
 
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-# Get Railway's public domain from environment variable, which is crucial for ALLOWED_HOSTS.
-RAILWAY_PUBLIC_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')
-if RAILWAY_PUBLIC_DOMAIN:
-    ALLOWED_HOSTS = [RAILWAY_PUBLIC_DOMAIN, 'healthcheck.railway.app']
-else:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+# This dynamically adds your Railway public URL to the allowed hosts.
+ALLOWED_HOSTS = os.environ.get('RAILWAY_PUBLIC_DOMAIN', 'localhost 127.0.0.1').split()
+ALLOWED_HOSTS.append('healthcheck.railway.app') # Required for Railway's health check
 
 # Application definition
 INSTALLED_APPS = [
@@ -24,23 +27,30 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'backend.trips',
+    # Third-party apps
     'rest_framework',
-    'corsheaders',  # Add corsheaders to installed apps
+    'corsheaders',
+
+    # Your apps here
+    # The correct path to your app is 'backend.trips'
+    'backend.trips',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # Add CorsMiddleware to the top of the list
+    'corsheaders.middleware.CorsMiddleware', 
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # Add CORS middleware
+    # Whitenoise is used to serve static files in production
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-ROOT_URLCONF = 'backend.core.urls'
+ROOT_URLCONF = 'backend.core.urls' # The correct path to your main URL configuration file
 
 TEMPLATES = [
     {
@@ -60,15 +70,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.core.wsgi.application'
 
-# Database
-# Use dj-database-url to parse the DATABASE_URL environment variable
 DATABASES = {
     "default": dj_database_url.config(
         default=os.environ.get("DATABASE_URL")
     )
 }
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -84,7 +91,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -93,15 +99,14 @@ USE_I18N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS configuration
 CORS_ALLOWED_ORIGINS = [
-    "https://logtracking.netlify.app",  # Add your frontend URL
+    "https://logtracking.netlify.app",
 ]
 
 # Logging configuration
@@ -123,12 +128,5 @@ LOGGING = {
     'root': {
         'handlers': ['console'],
         'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            'propagate': False,
-        },
     },
 }
