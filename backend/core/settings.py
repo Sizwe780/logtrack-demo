@@ -9,8 +9,12 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "your-secret-key-here")
 
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-# Get ALLOWED_HOSTS from environment variable, split by commas, and add Railway's health check host.
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1").split(',') + ['healthcheck.railway.app']
+# Get Railway's public domain from environment variable, which is crucial for ALLOWED_HOSTS.
+RAILWAY_PUBLIC_DOMAIN = os.environ.get('RAILWAY_PUBLIC_DOMAIN', '')
+if RAILWAY_PUBLIC_DOMAIN:
+    ALLOWED_HOSTS = [RAILWAY_PUBLIC_DOMAIN, 'healthcheck.railway.app']
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
