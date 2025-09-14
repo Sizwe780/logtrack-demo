@@ -121,3 +121,8 @@ LOGGING = {
         },
     },
 }
+
+# Add RAILWAY_STATIC_URL to ALLOWED_HOSTS if it exists.
+# We get it from a new environment variable from your Railway project.
+if os.environ.get('RAILWAY_STATIC_URL'):
+    ALLOWED_HOSTS.append(os.environ.get('RAILWAY_STATIC_URL'))
