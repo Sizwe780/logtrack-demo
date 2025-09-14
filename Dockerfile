@@ -16,4 +16,7 @@ RUN python manage.py migrate
 
 EXPOSE 8000
 
-CMD bash -c "gunicorn backend.core.wsgi:application --chdir backend --bind 0.0.0.0:$PORT"
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]
