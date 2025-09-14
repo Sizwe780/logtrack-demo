@@ -38,8 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'trips',
-    'backend.trips.apps.TripsConfig'
+    'backend.trips.apps.TripsConfig', # Make sure this is the only entry for your app
 ]
 
 MIDDLEWARE = [
