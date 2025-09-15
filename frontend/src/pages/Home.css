@@ -23,6 +23,12 @@ body {
 .form-container {
   max-width: 900px;
   margin: 0 auto;
+  /* --- MODIFICATIONS START --- */
+  background-color: #ffffff; /* A clean white background */
+  border-radius: 12px;       /* Adds rounded corners */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Adds a subtle drop shadow */
+  padding: 2.5rem;           /* Increases padding for a more spacious feel */
+  /* --- MODIFICATIONS END --- */
 }
 
 .form-title {
@@ -53,11 +59,21 @@ body {
 
 input {
   padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1px solid #e0e0e0; /* A lighter border color */
+  /* --- MODIFICATIONS START --- */
+  border-radius: 8px;        /* Slightly rounded corners for the inputs */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  /* --- MODIFICATIONS END --- */
   height: 40px;
   width: 100%;
   box-sizing: border-box;
+}
+
+/* Optional: Add a focus state for better user experience */
+input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .location-indicator {
@@ -88,10 +104,26 @@ button {
   padding: 0.6rem 1rem;
   font-size: 16px;
   border: none;
-  border-radius: 6px;
+  /* --- MODIFICATIONS START --- */
+  border-radius: 8px;        /* Rounded corners for the button */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* A slight shadow */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  /* --- MODIFICATIONS END --- */
   cursor: pointer;
   width: 120px;
 }
+
+/* Optional: Add a hover/active state for button */
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
 
 .contact-footer {
   position: absolute;
