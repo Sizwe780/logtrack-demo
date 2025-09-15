@@ -41,14 +41,17 @@ function TripList() {
   };
 
   const deleteTrip = async (id) => {
-    // This is a temporary front-end workaround.
-    // The trip will be removed from the local state, but not from the backend.
-    setTrips(trips.filter(trip => trip.id !== id));
-    setStopRemarksMap(prevRemarks => {
-      const newRemarks = { ...prevRemarks };
-      delete newRemarks[id];
-      return newRemarks;
-    });
+    try {
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/trips/${id}/`);
+      setTrips(trips.filter(trip => trip.id !== id));
+      setStopRemarksMap(prevRemarks => {
+        const newRemarks = { ...prevRemarks };
+        delete newRemarks[id];
+        return newRemarks;
+      });
+    } catch (error) {
+      console.error('Failed to delete the trip:', error);
+    }
   };
 
   const handleStopsGenerated = useCallback((tripId, remarks) => {
