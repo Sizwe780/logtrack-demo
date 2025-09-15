@@ -23,7 +23,13 @@ function TripMap({ origin, destination, trip, onStopsGenerated }) {
   };
 
   useEffect(() => {
-    if (!origin || !destination || map.current) return;
+    // Check if the map instance already exists to prevent re-initialization
+    if (map.current) return; 
+
+    if (!origin || !destination) {
+      console.error('Origin or destination coordinates are missing.');
+      return;
+    }
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
