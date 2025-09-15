@@ -60,7 +60,7 @@ function TripList() {
   };
 
   const handleStopsGenerated = (tripId, remarks) => {
-    setStopRemarksMap(prev => ({ ...prev, [tripId]: remarks }));
+      setStopRemarksMap(prev => ({ ...prev, [tripId]: remarks }));
   };
 
   return (
@@ -94,7 +94,7 @@ function TripList() {
               Delete Trip
             </button>
 
-            {trip.originCoords && trip.destCoords ? (
+            {trip.originCoords && trip.originCoords.lng && trip.destCoords && trip.destCoords.lng ? (
               <>
                 <TripMap
                   origin={trip.originCoords}
