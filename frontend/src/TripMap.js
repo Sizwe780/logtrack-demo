@@ -3,9 +3,10 @@ import mapboxgl from 'mapbox-gl';
 import axios from 'axios';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+// Your Mapbox access token. Please replace with your own valid token.
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2l6d2U3OCIsImEiOiJjbWZncWkwZnIwNDBtMmtxd3BkeXVtYjZzIn0.niS9m5pCbK5Kv-_On2mTcg';
 
-function TripMap({ origin, destination, currentLocation, trip, onStopsGenerated }) {
+function TripMap({ trip, onStopsGenerated }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
 
@@ -21,162 +22,191 @@ function TripMap({ origin, destination, currentLocation, trip, onStopsGenerated 
     }
   };
 
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    return `${hours} hrs ${minutes} min`;
+  };
+
   useEffect(() => {
-    if (!origin || !destination || map.current) return;
+    if (!trip.originCoords || !trip.destCoords || map.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [origin.lng, origin.lat],
-      zoom: 6,
+      center: [trip.originCoords.lng, trip.originCoords.lat],
+      zoom: 4
     });
 
-    map.current.on('load', () => {
-      new mapboxgl.Marker({ color: 'green' })
-        .setLngLat([origin.lng, origin.lat])
-        .setPopup(new mapboxgl.Popup().setText('Origin'))
-        .addTo(map.current);
+    map.current.on('load', async () => {
+      try {
+        const routeRes = await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${trip.originCoords.lng},${trip.originCoords.lat};${trip.destCoords.lng},${trip.destCoords.lat}`, {
+          params: {
+            alternatives: false,
+            geometries: 'geojson',
+            steps: true,
+            access_token: mapboxgl.accessToken,
+          },
+        });
 
-      new mapboxgl.Marker({ color: 'blue' })
-        .setLngLat([destination.lng, destination.lat])
-        .setPopup(new mapboxgl.Popup().setText('Destination'))
-        .addTo(map.current);
+        const route = routeRes.data.routes[0];
+        const routeGeometry = route.geometry;
+        const totalDistanceMiles = route.distance / 1609.34; // meters to miles
+        const totalDurationSeconds = route.duration; // seconds
 
-      if (currentLocation) {
-        const [lat, lng] = currentLocation.split(',').map(Number);
-        if (!isNaN(lat) && !isNaN(lng)) {
-          new mapboxgl.Marker({ color: 'red' })
-            .setLngLat([lng, lat])
-            .setPopup(new mapboxgl.Popup().setText('Current Location'))
-            .addTo(map.current);
-        }
-      }
+        const allStops = [];
 
-      const fetchRoute = async () => {
-        try {
-          const res = await axios.get(
-            `https://api.mapbox.com/directions/v5/mapbox/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}`,
-            {
-              params: {
-                geometries: 'geojson',
-                access_token: mapboxgl.accessToken,
-              },
+        // Add pickup and drop-off points first
+        allStops.push({
+          type: 'pickup',
+          location: trip.originCoords,
+          label: trip.origin,
+          remark: `Pickup at ${trip.origin} - Estimated at 0 hrs 0 min`,
+        });
+
+        // Add a single rest stop at the midpoint of the route path
+        const restStopIndex = Math.floor(routeGeometry.coordinates.length / 2);
+        const [restLng, restLat] = routeGeometry.coordinates[restStopIndex];
+        const restStopName = await getLocationName(restLng, restLat);
+        const restStopDuration = (totalDurationSeconds / 2);
+        allStops.push({
+          type: 'rest',
+          location: { lng: restLng, lat: restLat },
+          label: 'Rest Stop',
+          remark: `Rest stop near ${restStopName} - Estimated at ${formatTime(restStopDuration)}`,
+        });
+
+        // Add fuel stops every 1,000 miles
+        const fuelStopsNeeded = Math.floor(totalDistanceMiles / 1000);
+        if (fuelStopsNeeded > 0) {
+          const coordinates = routeGeometry.coordinates;
+          const segmentDistance = totalDistanceMiles / (fuelStopsNeeded + 1);
+          let cumulativeDistance = 0;
+          let currentCoordIndex = 0;
+          for (let i = 1; i <= fuelStopsNeeded; i++) {
+            const targetDistance = segmentDistance * i;
+            let currentSegmentLength = 0;
+            while (cumulativeDistance < targetDistance && currentCoordIndex < coordinates.length - 1) {
+              const [prevLng, prevLat] = coordinates[currentCoordIndex];
+              const [currLng, currLat] = coordinates[currentCoordIndex + 1];
+              const segment = new mapboxgl.LngLat(prevLng, prevLat).distanceTo(new mapboxgl.LngLat(currLng, currLat)) / 1609.34;
+              currentSegmentLength += segment;
+              if (cumulativeDistance + currentSegmentLength >= targetDistance) {
+                const [lng, lat] = coordinates[currentCoordIndex + 1];
+                const locationName = await getLocationName(lng, lat);
+                const fuelStopDuration = (totalDurationSeconds * ((cumulativeDistance + currentSegmentLength) / totalDistanceMiles));
+                allStops.push({
+                  type: 'fuel',
+                  location: { lng, lat },
+                  label: `Fuel Stop ${i}`,
+                  remark: `Fuel stop near ${locationName} - Estimated at ${formatTime(fuelStopDuration)}`,
+                });
+                break;
+              }
+              cumulativeDistance += segment;
+              currentCoordIndex++;
             }
-          );
+          }
+        }
+        
+        // Add drop-off point last
+        allStops.push({
+          type: 'dropoff',
+          location: trip.destCoords,
+          label: trip.destination,
+          remark: `Drop-off at ${trip.destination} - Estimated at ${formatTime(totalDurationSeconds)}`,
+        });
 
-          const route = res.data.routes[0].geometry;
-          const distanceMeters = res.data.routes[0].distance || 0;
-          const coordinates = route?.coordinates || [];
-
-          map.current.addSource('route', {
+        // Add the route line to the map
+        map.current.addLayer({
+          id: 'route',
+          type: 'line',
+          source: {
             type: 'geojson',
             data: {
               type: 'Feature',
-              geometry: route,
+              properties: {},
+              geometry: routeGeometry,
             },
-          });
+          },
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round',
+          },
+          paint: {
+            'line-color': '#007bff',
+            'line-width': 6,
+          },
+        });
 
-          map.current.addLayer({
-            id: 'route',
-            type: 'line',
-            source: 'route',
-            layout: {
-              'line-join': 'round',
-              'line-cap': 'round',
-            },
-            paint: {
-              'line-color': '#3b9ddd',
-              'line-width': 4,
-            },
-          });
-
-          const restInterval = 8;
-          const totalHours = typeof trip?.cycle_used === 'number' && trip.cycle_used > 0 ? trip.cycle_used : 24;
-          const restStopsNeeded = totalHours > restInterval ? Math.floor(totalHours / restInterval) : 0;
-          const stopRemarks = [];
-
-          console.log('Rest Stop Debug:', {
-            totalHours,
-            restStopsNeeded,
-            coordinatesLength: coordinates.length,
-          });
-
-          if (coordinates.length > 0 && restStopsNeeded >= 1) {
-            const stepSize = Math.floor(coordinates.length / (restStopsNeeded + 1));
-            const usedIndices = new Set();
-
-            for (let i = 1; i <= restStopsNeeded; i++) {
-              const index = stepSize * i;
-              if (usedIndices.has(index)) continue;
-              usedIndices.add(index);
-
-              const [lng, lat] = coordinates[index] || [];
-              if (!isNaN(lat) && !isNaN(lng)) {
-                const locationName = await getLocationName(lng, lat);
-                new mapboxgl.Marker({ color: 'orange' })
-                  .setLngLat([lng, lat])
-                  .setPopup(new mapboxgl.Popup().setText(`Rest Stop ${i}: ${locationName}`))
-                  .addTo(map.current);
-
-                stopRemarks.push(`Rest Stop ${i}: ${locationName}`);
-              } else {
-                console.warn(`Invalid rest stop coordinates at index ${index}:`, coordinates[index]);
-              }
-            }
-          } else {
-            console.warn('No rest stops generated:', {
-              totalHours,
-              restStopsNeeded,
-              coordinatesLength: coordinates.length,
-            });
+        // Plot markers for all stops
+        allStops.forEach(item => {
+          let color;
+          switch (item.type) {
+            case 'pickup':
+              color = '#4ade80'; // Green
+              break;
+            case 'dropoff':
+              color = '#3b82f6'; // Blue
+              break;
+            case 'rest':
+              color = '#ef4444'; // Red
+              break;
+            case 'fuel':
+              color = '#f97316'; // Orange
+              break;
+            default:
+              color = '#9ca3af'; // Gray
           }
 
-          const distanceMiles = distanceMeters / 1609.34;
-          const fuelStopsNeeded = Math.floor(distanceMiles / 1000);
+          const el = document.createElement('div');
+          el.className = 'marker';
+          el.style.backgroundColor = color;
+          el.style.width = '12px';
+          el.style.height = '12px';
+          el.style.borderRadius = '50%';
+          el.style.border = '2px solid white';
+          el.style.boxShadow = '0 0 5px rgba(0,0,0,0.5)';
 
-          if (coordinates.length > 0 && fuelStopsNeeded > 0) {
-            for (let i = 1; i <= fuelStopsNeeded; i++) {
-              const index = Math.floor((coordinates.length / (fuelStopsNeeded + 1)) * i);
-              const [lng, lat] = coordinates[index] || [];
+          new mapboxgl.Marker(el)
+            .setLngLat(item.location)
+            .setPopup(new mapboxgl.Popup({ offset: 25 })
+              .setHTML(`
+                <div class="p-2 text-sm text-gray-800">
+                  <h3 class="font-bold mb-1">${item.label}</h3>
+                  <p>${item.remark}</p>
+                </div>
+              `))
+            .addTo(map.current);
+        });
 
-              if (!isNaN(lat) && !isNaN(lng)) {
-                const locationName = await getLocationName(lng, lat);
-                new mapboxgl.Marker({ color: 'purple' })
-                  .setLngLat([lng, lat])
-                  .setPopup(new mapboxgl.Popup().setText(`Fuel Stop ${i}: ${locationName}`))
-                  .addTo(map.current);
+        const bounds = new mapboxgl.LngLatBounds();
+        allStops.forEach(item => bounds.extend(item.location));
+        map.current.fitBounds(bounds, { padding: 50 });
 
-                stopRemarks.push(`Fuel Stop ${i}: ${locationName}`);
-              }
-            }
-          }
-
-          if (stopRemarks.length > 0 && typeof onStopsGenerated === 'function') {
-            trip.stopRemarks = stopRemarks;
-            onStopsGenerated(stopRemarks);
-          }
-
-          if (totalHours > 70) {
-            console.warn(`Driver exceeds 70hr/8-day limit: ${totalHours} hrs`);
-          }
-
-        } catch (error) {
-          console.error('Route fetch failed:', error);
+        // Generate remarks for TripLog
+        if (typeof onStopsGenerated === 'function') {
+          const remarks = allStops.map(s => s.remark);
+          onStopsGenerated(remarks);
         }
-      };
 
-      fetchRoute();
+      } catch (error) {
+        console.error('Route fetch failed:', error);
+      }
     });
 
     return () => {
       if (map.current) {
         map.current.remove();
-        map.current = null;
       }
     };
-  }, [origin, destination, currentLocation, trip, onStopsGenerated]);
+  }, [trip, onStopsGenerated]);
 
-  return <div ref={mapContainer} style={{ height: '400px' }} />;
+  return (
+    <div className="relative w-full h-96 rounded-xl overflow-hidden shadow-lg">
+      <div ref={mapContainer} className="h-full w-full" />
+    </div>
+  );
 }
 
 export default TripMap;
