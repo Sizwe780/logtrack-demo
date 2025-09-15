@@ -1,41 +1,63 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 function TripLog({ trip, stopRemarks = [] }) {
-  // We'll use the stopRemarks array directly, which is passed from the parent component.
-  // This avoids generating duplicate remarks.
-  const remarksToDisplay = Array.isArray(stopRemarks) ? stopRemarks : [];
+  const [remarks, setRemarks] = useState([]);
 
   const drivingHours = typeof trip.cycle_used === 'number' ? trip.cycle_used : 0;
   const totalHours = drivingHours + 2;
   const sheetCount = Math.ceil(totalHours / 24);
+  const startHour = trip.departure_time ? new Date(trip.departure_time).getHours() : 0;
+
+  const restInterval = 16.6;
+  const restStopHours = [];
+  for (let i = 1; i <= Math.floor(drivingHours / restInterval); i++) {
+    restStopHours.push(startHour + i * Math.round(restInterval));
+  }
+
+  const fuelInterval = 5;
+  const fuelStopHours = [];
+  for (let i = 1; i <= Math.floor(drivingHours / fuelInterval); i++) {
+    fuelStopHours.push(startHour + i * fuelInterval);
+  }
+
+  useEffect(() => {
+    const remarks = [...stopRemarks];
+
+    const pickupTime = trip.departure_time ? new Date(trip.departure_time).toLocaleString() : 'Unknown time';
+    remarks.push(`Pickup at ${trip.origin} at ${pickupTime}`);
+    remarks.push(`Drop-off at ${trip.destination}`);
+
+    restStopHours.forEach(hour => {
+      remarks.push(`Rest stop at [Location ${hour}] at ${hour}:00`);
+    });
+
+    fuelStopHours.forEach(hour => {
+      remarks.push(`Fuel stop at [Location ${hour}] at ${hour}:00`);
+    });
+
+    setRemarks(remarks);
+  }, [trip, stopRemarks]);
+
+  const getRemarkForHour = (hour) => {
+    if (hour === startHour) return `Pickup at ${trip.origin}`;
+    if (hour === startHour + drivingHours + 1) return `Drop-off at ${trip.destination}`;
+    if (restStopHours.includes(hour)) return `Rest stop at [Location ${hour}]`;
+    if (fuelStopHours.includes(hour)) return `Fuel stop at [Location ${hour}]`;
+    if (hour > startHour && hour <= startHour + drivingHours) return `Driving`;
+    return `Off Duty`;
+  };
 
   const renderLogSheet = (day) => {
     const generateLogRows = () => {
       const rows = [];
       const dayOffset = (day - 1) * 24;
 
-      // The original logic for calculating driving, rest, etc. is still here
-      // and can be simplified, but for now we'll keep it.
-      // This is not directly related to the remarks issue.
       for (let hour = 0; hour < 24; hour++) {
         const globalHour = dayOffset + hour;
         let offDuty = 'X';
         let sleeper = '';
         let driving = '';
         let onDuty = '';
-
-        const startHour = trip.departure_time ? new Date(trip.departure_time).getHours() : 0;
-        const restInterval = 16.6;
-        const restStopHours = [];
-        for (let i = 1; i <= Math.floor(drivingHours / restInterval); i++) {
-          restStopHours.push(startHour + i * Math.round(restInterval));
-        }
-
-        const fuelInterval = 5;
-        const fuelStopHours = [];
-        for (let i = 1; i <= Math.floor(drivingHours / fuelInterval); i++) {
-          fuelStopHours.push(startHour + i * fuelInterval);
-        }
 
         const isPickup = globalHour === startHour;
         const isDropoff = globalHour === startHour + drivingHours + 1;
@@ -71,6 +93,7 @@ function TripLog({ trip, stopRemarks = [] }) {
           </tr>
         );
       }
+
       return rows;
     };
 
@@ -94,17 +117,12 @@ function TripLog({ trip, stopRemarks = [] }) {
   };
 
   const exportLogToCSV = () => {
-    const getRemarkForHour = (hour) => {
-      // This function needs to be re-evaluated to work correctly without a single source of truth.
-      // For now, it will simply return a placeholder remark.
-      return `Hour ${hour} Remark`;
-    };
-
     const headers = ['Hour', 'Off Duty', 'Sleeper', 'Driving', 'On Duty', 'Remarks'];
     const csvRows = [];
 
     for (let day = 1; day <= sheetCount; day++) {
       const dayOffset = (day - 1) * 24;
+
       csvRows.push([`Day ${day}`]);
       csvRows.push(headers);
 
@@ -116,19 +134,6 @@ function TripLog({ trip, stopRemarks = [] }) {
         let sleeper = '';
         let driving = '';
         let onDuty = '';
-
-        const startHour = trip.departure_time ? new Date(trip.departure_time).getHours() : 0;
-        const restInterval = 16.6;
-        const restStopHours = [];
-        for (let i = 1; i <= Math.floor(drivingHours / restInterval); i++) {
-          restStopHours.push(startHour + i * Math.round(restInterval));
-        }
-
-        const fuelInterval = 5;
-        const fuelStopHours = [];
-        for (let i = 1; i <= Math.floor(drivingHours / fuelInterval); i++) {
-          fuelStopHours.push(startHour + i * fuelInterval);
-        }
 
         const isPickup = globalHour === startHour;
         const isDropoff = globalHour === startHour + drivingHours + 1;
@@ -157,6 +162,7 @@ function TripLog({ trip, stopRemarks = [] }) {
         const hourRemark = getRemarkForHour(globalHour);
         csvRows.push([hourLabel, offDuty, sleeper, driving, onDuty, hourRemark]);
       }
+
       csvRows.push([]);
     }
 
@@ -168,7 +174,7 @@ function TripLog({ trip, stopRemarks = [] }) {
       ['Current Location:', trip.current_location || 'N/A'],
       ['Cycle Used:', trip.cycle_used !== null && trip.cycle_used !== undefined ? `${trip.cycle_used} hrs` : 'N/A'],
       ['City:', 'Nelson Mandela Bay Metropolitan Municipality'],
-      ['Remarks:', remarksToDisplay.join(' | ')],
+      ['Remarks:', remarks.join(' | ')],
       [],
     ];
 
@@ -192,11 +198,7 @@ function TripLog({ trip, stopRemarks = [] }) {
       <div style={{ marginBottom: '1rem' }}>
         <h4>Trip Remarks</h4>
         <ul>
-          {remarksToDisplay.length > 0 ? (
-            remarksToDisplay.map((r, i) => <li key={i}>{r}</li>)
-          ) : (
-            <li>No remarks found for this trip.</li>
-          )}
+          {remarks.map((r, i) => <li key={i}>{r}</li>)}
         </ul>
       </div>
 
