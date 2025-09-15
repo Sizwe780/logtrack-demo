@@ -53,7 +53,7 @@ function TripList() {
     try {
       const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/trips/${id}/`);
       console.log('Delete successful:', response);
-      fetchTrips(); // Re-fetch the trips list to update the UI
+      fetchTrips();
     } catch (error) {
       console.error('Failed to delete trip:', error.response ? error.response.data : error.message);
     }
