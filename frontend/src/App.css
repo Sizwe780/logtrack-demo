@@ -22,7 +22,7 @@
 .tab.active {
   border-bottom: 2px solid #007bff;
   color: #007bff;
-}  
+}
 
 .top-nav {
   width: 100%;
@@ -31,7 +31,15 @@
   align-items: center;
   padding: 1.30rem 0;
   background-color: white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  /* --- MODIFICATIONS START --- */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Keep existing shadow */
+  border-radius: 10px; /* Add rounded corners to the nav bar */
+  margin: 0 1.5rem; /* Add some horizontal margin to the nav bar */
+  /* Adjust padding to account for rounded corners */
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* A more prominent shadow for the nav bar */
+  /* --- MODIFICATIONS END --- */
   position: fixed;
   top: 0;
   left: 0;
@@ -40,27 +48,27 @@
 }
 
 .App {
-text-align: center;
+  text-align: center;
 }
 
 .App-logo {
-height: 40vmin;
-pointer-events: none;
+  height: 40vmin;
+  pointer-events: none;
 }
 
 .App-header {
-background-color: #282c34;
-min-height: 100vh;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-font-size: calc(10px + 2vmin);
-color: white;
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
 }
 
 .App-link {
-color: #61dafb;
+  color: #61dafb;
 }
 
 .nav-logo-container {
