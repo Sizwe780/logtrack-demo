@@ -6,7 +6,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 // Your Mapbox access token. Please replace with your own valid token.
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2l6d2U3OCIsImEiOiJjbWZncWkwZnIwNDBtMmtxd3BkeXVtYjZzIn0.niS9m5pCbK5Kv-_On2mTcg';
 
-function TripMap({ trip, onStopsGenerated }) {
+function TripMap({ origin, destination, trip, onStopsGenerated }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
 
@@ -29,18 +29,18 @@ function TripMap({ trip, onStopsGenerated }) {
   };
 
   useEffect(() => {
-    if (!trip.originCoords || !trip.destCoords || map.current) return;
+    if (!origin || !destination || map.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
-      center: [trip.originCoords.lng, trip.originCoords.lat],
+      center: [origin.lng, origin.lat],
       zoom: 4
     });
 
     map.current.on('load', async () => {
       try {
-        const routeRes = await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${trip.originCoords.lng},${trip.originCoords.lat};${trip.destCoords.lng},${trip.destCoords.lat}`, {
+        const routeRes = await axios.get(`https://api.mapbox.com/directions/v5/mapbox/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}`, {
           params: {
             alternatives: false,
             geometries: 'geojson',
@@ -59,7 +59,7 @@ function TripMap({ trip, onStopsGenerated }) {
         // Add pickup and drop-off points first
         allStops.push({
           type: 'pickup',
-          location: trip.originCoords,
+          location: origin,
           label: trip.origin,
           remark: `Pickup at ${trip.origin} - Estimated at 0 hrs 0 min`,
         });
@@ -112,7 +112,7 @@ function TripMap({ trip, onStopsGenerated }) {
         // Add drop-off point last
         allStops.push({
           type: 'dropoff',
-          location: trip.destCoords,
+          location: destination,
           label: trip.destination,
           remark: `Drop-off at ${trip.destination} - Estimated at ${formatTime(totalDurationSeconds)}`,
         });
@@ -200,7 +200,7 @@ function TripMap({ trip, onStopsGenerated }) {
         map.current.remove();
       }
     };
-  }, [trip, onStopsGenerated]);
+  }, [origin, destination, trip, onStopsGenerated]);
 
   return (
     <div className="relative w-full h-96 rounded-xl overflow-hidden shadow-lg">
