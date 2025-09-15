@@ -59,9 +59,10 @@ function TripList() {
     }
   };
 
-  const handleStopsGenerated = (tripId, remarks) => {
-      setStopRemarksMap(prev => ({ ...prev, [tripId]: remarks }));
-  };
+  // Use useCallback to memoize the function, preventing unnecessary re-renders of TripMap
+  const handleStopsGenerated = useCallback((tripId, remarks) => {
+    setStopRemarksMap(prev => ({ ...prev, [tripId]: remarks }));
+  }, []);
 
   return (
     <div style={{ padding: '2rem' }}>
