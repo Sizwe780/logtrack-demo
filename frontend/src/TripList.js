@@ -8,6 +8,7 @@ const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2l6d2U3OCIsImEiOiJjbWZncWkwZnIwNDBtMmtxd3BkeXV
 function TripList() {
   const [trips, setTrips] = useState([]);
   const [stopRemarksMap, setStopRemarksMap] = useState({});
+  const [loading, setLoading] = useState(true);
 
   const geocodeLocation = async (location) => {
     if (!location) return null;
@@ -19,43 +20,28 @@ function TripList() {
       return coords && coords.length === 2
         ? { lng: coords[0], lat: coords[1] }
         : null;
-    } catch {
+    } catch (error) {
+      console.error(`Geocoding failed for location "${location}":`, error);
       return null;
     }
   };
 
   const fetchTrips = async () => {
+    setLoading(true);
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/trips/`);
       const enrichedTrips = await Promise.all(
         res.data.map(async (trip) => {
           const originCoords = await geocodeLocation(trip.origin);
           const destCoords = await geocodeLocation(trip.destination);
-          return {
-            ...trip,
-            originCoords,
-            destCoords,
-          };
+          return { ...trip, originCoords, destCoords };
         })
       );
       setTrips(enrichedTrips);
     } catch (error) {
-      console.error('Failed to fetch trips:', error);
-    }
-  };
-
-  const deleteTrip = async (id) => {
-    try {
-      await axios.delete(`http://127.0.0.1:8000/api/trips/${id}/`);
-      setTrips((prev) => prev.filter((trip) => trip.id !== id));
-      setStopRemarksMap((prev) => {
-        const updated = { ...prev };
-        delete updated[id];
-        return updated;
-      });
-    } catch (error) {
-      console.error('Failed to delete trip:', error);
-      alert('Could not delete trip.');
+      console.error('Failed to fetch trips:', error.response ? error.response.data : error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -63,26 +49,33 @@ function TripList() {
     fetchTrips();
   }, []);
 
-  const handleStopsGenerated = useCallback((tripId, remarks) => {
-    setStopRemarksMap((prev) => ({
-      ...prev,
-      [tripId]: remarks,
-    }));
-  }, []);
+  const deleteTrip = async (id) => {
+    try {
+      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/trips/${id}/`);
+      console.log('Delete successful:', response);
+      fetchTrips(); // Re-fetch the trips list to update the UI
+    } catch (error) {
+      console.error('Failed to delete trip:', error.response ? error.response.data : error.message);
+    }
+  };
+
+  const handleStopsGenerated = (tripId, remarks) => {
+    setStopRemarksMap(prev => ({ ...prev, [tripId]: remarks }));
+  };
 
   return (
-    <div>
-      <h2>Submitted Trips</h2>
-
-      {trips.length === 0 ? (
-        <p>No trips found. Try submitting one from the Home tab.</p>
+    <div style={{ padding: '2rem' }}>
+      <h1>Trip Dashboard</h1>
+      {loading ? (
+        <p>Loading trips...</p>
+      ) : trips.length === 0 ? (
+        <p>No trips found. Please submit a trip from the Home tab.</p>
       ) : (
         trips.map((trip) => (
-          <div key={trip.id} style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '2rem' }}>
-            <p><strong>Driver:</strong> {trip.driver_name || 'N/A'}</p>
-            <p><strong>Date:</strong> {trip.date ? new Date(trip.date).toLocaleDateString() : 'N/A'}</p>
-            <p><strong>Departure Time:</strong> {trip.departure_time ? new Date(trip.departure_time).toLocaleString() : 'N/A'}</p>
-            <p><strong>Origin → Destination:</strong> {trip.origin} → {trip.destination}</p>
+          <div key={trip.id} style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem', borderRadius: '8px' }}>
+            <h3>{trip.driver_name}</h3>
+            <p><strong>Origin:</strong> {trip.origin}</p>
+            <p><strong>Destination:</strong> {trip.destination}</p>
             <p><strong>Current Location:</strong> {trip.current_location || 'N/A'}</p>
             <p><strong>Cycle Used:</strong> {trip.cycle_used !== null && trip.cycle_used !== undefined ? `${trip.cycle_used} hrs` : 'N/A'}</p>
 
@@ -95,6 +88,7 @@ function TripList() {
                 border: 'none',
                 padding: '0.5rem 1rem',
                 cursor: 'pointer',
+                borderRadius: '5px',
               }}
             >
               Delete Trip
@@ -105,17 +99,13 @@ function TripList() {
                 <TripMap
                   origin={trip.originCoords}
                   destination={trip.destCoords}
-                  currentLocation={trip.current_location}
-                  cycleUsed={trip.cycle_used}
-                  departureTime={trip.departure_time}
-                  originLabel={trip.origin}
-                  destinationLabel={trip.destination}
+                  trip={trip}
                   onStopsGenerated={(remarks) => handleStopsGenerated(trip.id, remarks)}
                 />
                 <TripLog trip={trip} stopRemarks={stopRemarksMap[trip.id] || []} />
               </>
             ) : (
-              <p>Map unavailable for this trip.</p>
+              <p>Map unavailable for this trip. Check console for geocoding errors.</p>
             )}
           </div>
         ))
