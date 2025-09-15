@@ -31,11 +31,7 @@ function TripList() {
         res.data.map(async (trip) => {
           const originCoords = await geocodeLocation(trip.origin);
           const destCoords = await geocodeLocation(trip.destination);
-          return {
-            ...trip,
-            originCoords,
-            destCoords,
-          };
+          return { ...trip, originCoords, destCoords };
         })
       );
       setTrips(enrichedTrips);
@@ -46,43 +42,41 @@ function TripList() {
 
   const deleteTrip = async (id) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/trips/${id}/`);
-      setTrips((prev) => prev.filter((trip) => trip.id !== id));
-      setStopRemarksMap((prev) => {
-        const updated = { ...prev };
-        delete updated[id];
-        return updated;
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/trips/${id}/`);
+      setTrips(trips.filter(trip => trip.id !== id));
+      // Also remove remarks for the deleted trip
+      setStopRemarksMap(prevRemarks => {
+        const newRemarks = { ...prevRemarks };
+        delete newRemarks[id];
+        return newRemarks;
       });
     } catch (error) {
-      console.error('Failed to delete trip:', error);
-      alert('Could not delete trip.');
+      console.error('Failed to delete the trip:', error);
     }
   };
+
+  const handleStopsGenerated = useCallback((tripId, remarks) => {
+    setStopRemarksMap(prevRemarks => ({
+      ...prevRemarks,
+      [tripId]: remarks,
+    }));
+  }, []);
 
   useEffect(() => {
     fetchTrips();
   }, []);
 
-  const handleStopsGenerated = useCallback((tripId, remarks) => {
-    setStopRemarksMap((prev) => ({
-      ...prev,
-      [tripId]: remarks,
-    }));
-  }, []);
-
   return (
-    <div>
-      <h2>Submitted Trips</h2>
-
+    <div className="container mx-auto p-4">
+      <h2 className="text-3xl font-bold mb-4">Trip Dashboard</h2>
       {trips.length === 0 ? (
-        <p>No trips found. Try submitting one from the Home tab.</p>
+        <p>No trips to display. Submit a new trip on the Home page.</p>
       ) : (
         trips.map((trip) => (
-          <div key={trip.id} style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '2rem' }}>
+          <div key={trip.id} className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 className="text-xl font-semibold mb-2">{trip.origin} → {trip.destination}</h3>
             <p><strong>Driver:</strong> {trip.driver_name || 'N/A'}</p>
-            <p><strong>Date:</strong> {trip.date ? new Date(trip.date).toLocaleDateString() : 'N/A'}</p>
-            <p><strong>Departure Time:</strong> {trip.departure_time ? new Date(trip.departure_time).toLocaleString() : 'N/A'}</p>
-            <p><strong>Origin → Destination:</strong> {trip.origin} → {trip.destination}</p>
+            <p><strong>Date:</strong> {trip.date || 'N/A'}</p>
             <p><strong>Current Location:</strong> {trip.current_location || 'N/A'}</p>
             <p><strong>Cycle Used:</strong> {trip.cycle_used !== null && trip.cycle_used !== undefined ? `${trip.cycle_used} hrs` : 'N/A'}</p>
 
@@ -106,10 +100,7 @@ function TripList() {
                   origin={trip.originCoords}
                   destination={trip.destCoords}
                   currentLocation={trip.current_location}
-                  cycleUsed={trip.cycle_used}
-                  departureTime={trip.departure_time}
-                  originLabel={trip.origin}
-                  destinationLabel={trip.destination}
+                  trip={trip}
                   onStopsGenerated={(remarks) => handleStopsGenerated(trip.id, remarks)}
                 />
                 <TripLog trip={trip} stopRemarks={stopRemarksMap[trip.id] || []} />
