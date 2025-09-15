@@ -56,8 +56,8 @@ function TripMap({ origin, destination, trip, onStopsGenerated }) {
 
         const route = routeRes.data.routes[0];
 
-        if (!route) {
-          console.error('Route not found in API response.');
+        if (!route || !route.geometry || !route.duration || !route.distance) {
+          console.error('Route not found or has invalid data in API response.');
           onStopsGenerated([]);
           return;
         }
@@ -95,7 +95,7 @@ function TripMap({ origin, destination, trip, onStopsGenerated }) {
         const stopRemarks = [];
         const coordinates = routeGeoJSON.coordinates;
         const totalDistanceMiles = route.distance / 1609.34;
-        const drivingHours = typeof trip.cycle_used === 'number' ? trip.cycle_used : 0;
+        const drivingHours = typeof trip.cycle_used === 'number' && trip.cycle_used > 0 ? trip.cycle_used : 0;
         const departureTime = trip.departure_time ? new Date(trip.departure_time) : new Date();
 
         const addStop = (location, type, timeInMinutes = null) => {
@@ -120,29 +120,32 @@ function TripMap({ origin, destination, trip, onStopsGenerated }) {
         stopRemarks.push(`Pickup at ${trip.origin} at ${departureTime.toLocaleString()}`);
         stopRemarks.push(`Drop-off at ${trip.destination}`);
 
-        // Rest Stops (every 16.6 hours of driving)
-        const restInterval = 16.6;
-        for (let i = 1; i <= Math.floor(drivingHours / restInterval); i++) {
-          const restTimeInMinutes = i * restInterval * 60;
-          const pointIndex = Math.floor((restTimeInMinutes / route.duration) * coordinates.length);
-          const [lng, lat] = coordinates[pointIndex] || [];
-          if (!isNaN(lat) && !isNaN(lng)) {
-            const locationName = await getLocationName(lng, lat);
-            addMarker(lng, lat, '#ffc107', `Rest Stop ${i}: ${locationName}`);
-            addStop(locationName, 'Rest stop', restTimeInMinutes);
+        // Only add rest and fuel stops if there are positive driving hours
+        if (drivingHours > 0) {
+          // Rest Stops (every 16.6 hours of driving)
+          const restInterval = 16.6;
+          for (let i = 1; i <= Math.floor(drivingHours / restInterval); i++) {
+            const restTimeInMinutes = i * restInterval * 60;
+            const pointIndex = Math.floor((restTimeInMinutes / route.duration) * coordinates.length);
+            const [lng, lat] = coordinates[pointIndex] || [];
+            if (!isNaN(lat) && !isNaN(lng)) {
+              const locationName = await getLocationName(lng, lat);
+              addMarker(lng, lat, '#ffc107', `Rest Stop ${i}: ${locationName}`);
+              addStop(locationName, 'Rest stop', restTimeInMinutes);
+            }
           }
-        }
 
-        // Fuel Stops (every 1000 miles, ~20 hours driving)
-        const fuelIntervalHours = 1000 / 50;
-        for (let i = 1; i <= Math.floor(drivingHours / fuelIntervalHours); i++) {
-          const fuelTimeInMinutes = i * fuelIntervalHours * 60;
-          const pointIndex = Math.floor((fuelTimeInMinutes / route.duration) * coordinates.length);
-          const [lng, lat] = coordinates[pointIndex] || [];
-          if (!isNaN(lat) && !isNaN(lng)) {
-            const locationName = await getLocationName(lng, lat);
-            addMarker(lng, lat, 'blue', `Fuel Stop ${i}: ${locationName}`);
-            addStop(locationName, 'Fuel stop', fuelTimeInMinutes);
+          // Fuel Stops (every 1000 miles, ~20 hours driving)
+          const fuelIntervalHours = 1000 / 50;
+          for (let i = 1; i <= Math.floor(drivingHours / fuelIntervalHours); i++) {
+            const fuelTimeInMinutes = i * fuelIntervalHours * 60;
+            const pointIndex = Math.floor((fuelTimeInMinutes / route.duration) * coordinates.length);
+            const [lng, lat] = coordinates[pointIndex] || [];
+            if (!isNaN(lat) && !isNaN(lng)) {
+              const locationName = await getLocationName(lng, lat);
+              addMarker(lng, lat, 'blue', `Fuel Stop ${i}: ${locationName}`);
+              addStop(locationName, 'Fuel stop', fuelTimeInMinutes);
+            }
           }
         }
         
@@ -165,7 +168,7 @@ function TripMap({ origin, destination, trip, onStopsGenerated }) {
         map.current = null;
       }
     };
-  }, [origin, destination, trip, onStopsGenerated]);
+  }, [origin, destination, trip.id, trip.cycle_used, onStopsGenerated]);
 
   return <div ref={mapContainer} style={{ width: '100%', height: '400px' }} />;
 }
