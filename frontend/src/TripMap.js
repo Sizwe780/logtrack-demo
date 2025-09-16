@@ -42,11 +42,11 @@ function TripMap({ origin, destination, currentLocation, trip, onStopsGenerated 
         .setPopup(new mapboxgl.Popup().setText('Destination'))
         .addTo(map.current);
 
-      if (currentLocation) {
-        const [lat, lng] = currentLocation.split(',').map(Number);
-        if (!isNaN(lat) && !isNaN(lng)) {
+      if (currentLocation && typeof currentLocation === 'object') {
+        const { latitude, longitude } = currentLocation;
+        if (!isNaN(latitude) && !isNaN(longitude)) {
           new mapboxgl.Marker({ color: 'red' })
-            .setLngLat([lng, lat])
+            .setLngLat([longitude, latitude])
             .setPopup(new mapboxgl.Popup().setText('Current Location'))
             .addTo(map.current);
         }
