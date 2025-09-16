@@ -9,12 +9,6 @@ function App() {
   return (
     <div className="app-container">
       <nav className="top-nav">
-        {/* Logo on the left */}
-        <div className="nav-logo-container">
-          <img src="/logo.png" alt="App Logo" className="nav-logo" />
-        </div>
-
-        {/* Tabs centered, untouched */}
         <div className="nav-tabs">
           <span
             className={`tab ${activeTab === 'submit' ? 'active' : ''}`}
@@ -30,7 +24,6 @@ function App() {
           </span>
         </div>
       </nav>
-
       {activeTab === 'submit' && <Home setActiveTab={setActiveTab} />}
       {activeTab === 'dashboard' && <TripList />}
     </div>

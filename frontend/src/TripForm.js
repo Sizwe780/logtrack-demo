@@ -1,5 +1,7 @@
+// TripForm.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './Home.css'; // Pulls in your upgraded styles
 
 function TripForm() {
   const [origin, setOrigin] = useState('');
@@ -22,7 +24,6 @@ function TripForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const tripData = {
       origin,
       destination,
@@ -32,7 +33,6 @@ function TripForm() {
       cycle_used: Number(cycleUsed),
       departure_time: departureTime,
     };
-
     try {
       await axios.post(`${process.env.REACT_APP_API_URL}/api/trips/`, tripData);
       setOrigin('');
@@ -50,23 +50,50 @@ function TripForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
-      <h2>Submit Trip Details</h2>
-      <input type="text" placeholder="Origin" value={origin} onChange={(e) => setOrigin(e.target.value)} />
-      <input type="text" placeholder="Destination" value={destination} onChange={(e) => setDestination(e.target.value)} />
-      <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-      <input type="text" placeholder="Driver Name" value={driverName} onChange={(e) => setDriverName(e.target.value)} />
-      <input type="text" placeholder="Current Location" value={currentLocation} onChange={(e) => setCurrentLocation(e.target.value)} />
-      <input type="number" placeholder="Current Cycle Used (hrs)" value={cycleUsed} onChange={(e) => setCycleUsed(e.target.value)} />
-      <label>Departure Time:</label>
-      <input
-        type="datetime-local"
-        value={departureTime}
-        onChange={(e) => setDepartureTime(e.target.value)}
-        required
-      />
-      <button type="submit">Submit Trip</button>
-    </form>
+    <div className="form-container">
+      <h2 className="form-title">Submit Trip Details</h2>
+      <form className="trip-form" onSubmit={handleSubmit}>
+        <div className="form-row">
+          <div className="form-group">
+            <label>Origin</label>
+            <input type="text" value={origin} onChange={(e) => setOrigin(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>Destination</label>
+            <input type="text" value={destination} onChange={(e) => setDestination(e.target.value)} required />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-group">
+            <label>Date</label>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+          </div>
+          <div className="form-group">
+            <label>Driver Name</label>
+            <input type="text" value={driverName} onChange={(e) => setDriverName(e.target.value)} required />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-group">
+            <label>Current Location</label>
+            <input type="text" value={currentLocation} onChange={(e) => setCurrentLocation(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label>Cycle Used (hrs)</label>
+            <input type="number" value={cycleUsed} onChange={(e) => setCycleUsed(e.target.value)} required />
+          </div>
+        </div>
+        <div className="form-row">
+          <div className="form-group">
+            <label>Departure Time</label>
+            <input type="datetime-local" value={departureTime} onChange={(e) => setDepartureTime(e.target.value)} required />
+          </div>
+        </div>
+        <div className="form-row submit-row">
+          <button type="submit">Submit Trip</button>
+        </div>
+      </form>
+    </div>
   );
 }
 

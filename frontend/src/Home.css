@@ -5,11 +5,11 @@ body {
 }
 
 .home-container {
-  padding-top: 100px;
+  padding-top: 25px;
   padding-left: 2rem;
   padding-right: 2rem;
   font-family: 'Segoe UI', sans-serif;
-  min-height: 100vh;
+  min-height: 80vh;
   box-sizing: border-box;
 }
 
@@ -22,7 +22,11 @@ body {
 
 .form-container {
   max-width: 900px;
-  margin: 0 auto;
+  margin: 40px auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  padding: 2.5rem;
 }
 
 .form-title {
@@ -41,7 +45,7 @@ body {
 .form-row {
   display: flex;
   gap: 2rem;
-  align-items: flex-start; /* Aligns inputs to the top of the row */
+  align-items: flex-start;
 }
 
 .form-group {
@@ -78,8 +82,8 @@ input {
 .submit-row {
   display: flex;
   justify-content: flex-end;
-  align-items: flex-start; /* Aligns button to the top */
-  margin-top: 1rem; /* No negative margin needed */
+  align-items: flex-start;
+  margin-top: 1rem;
 }
 
 button {

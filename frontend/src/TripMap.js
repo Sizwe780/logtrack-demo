@@ -95,57 +95,44 @@ function TripMap({ origin, destination, currentLocation, trip, onStopsGenerated 
           const restStopsNeeded = totalHours > restInterval ? Math.floor(totalHours / restInterval) : 0;
           const stopRemarks = [];
 
-          console.log('Rest Stop Debug:', {
-            totalHours,
-            restStopsNeeded,
-            coordinatesLength: coordinates.length,
-          });
+          console.log('Rest Stop Debug:', { totalHours, restStopsNeeded, coordinatesLength: coordinates.length });
 
           if (coordinates.length > 0 && restStopsNeeded >= 1) {
             const stepSize = Math.floor(coordinates.length / (restStopsNeeded + 1));
             const usedIndices = new Set();
-
             for (let i = 1; i <= restStopsNeeded; i++) {
               const index = stepSize * i;
               if (usedIndices.has(index)) continue;
               usedIndices.add(index);
-
               const [lng, lat] = coordinates[index] || [];
+
               if (!isNaN(lat) && !isNaN(lng)) {
                 const locationName = await getLocationName(lng, lat);
                 new mapboxgl.Marker({ color: 'orange' })
                   .setLngLat([lng, lat])
                   .setPopup(new mapboxgl.Popup().setText(`Rest Stop ${i}: ${locationName}`))
                   .addTo(map.current);
-
                 stopRemarks.push(`Rest Stop ${i}: ${locationName}`);
               } else {
                 console.warn(`Invalid rest stop coordinates at index ${index}:`, coordinates[index]);
               }
             }
           } else {
-            console.warn('No rest stops generated:', {
-              totalHours,
-              restStopsNeeded,
-              coordinatesLength: coordinates.length,
-            });
+            console.warn('No rest stops generated:', { totalHours, restStopsNeeded, coordinatesLength: coordinates.length });
           }
 
           const distanceMiles = distanceMeters / 1609.34;
           const fuelStopsNeeded = Math.floor(distanceMiles / 1000);
-
           if (coordinates.length > 0 && fuelStopsNeeded > 0) {
             for (let i = 1; i <= fuelStopsNeeded; i++) {
               const index = Math.floor((coordinates.length / (fuelStopsNeeded + 1)) * i);
               const [lng, lat] = coordinates[index] || [];
-
               if (!isNaN(lat) && !isNaN(lng)) {
                 const locationName = await getLocationName(lng, lat);
                 new mapboxgl.Marker({ color: 'purple' })
                   .setLngLat([lng, lat])
                   .setPopup(new mapboxgl.Popup().setText(`Fuel Stop ${i}: ${locationName}`))
                   .addTo(map.current);
-
                 stopRemarks.push(`Fuel Stop ${i}: ${locationName}`);
               }
             }
@@ -157,11 +144,10 @@ function TripMap({ origin, destination, currentLocation, trip, onStopsGenerated 
           }
 
           if (totalHours > 70) {
-            console.warn(`Driver exceeds 70hr/8-day limit: ${totalHours} hrs`);
+            console.warn(`Driver exceeds 70 hours.`);
           }
-
         } catch (error) {
-          console.error('Route fetch failed:', error);
+          console.error('Failed to fetch route:', error);
         }
       };
 
@@ -176,7 +162,11 @@ function TripMap({ origin, destination, currentLocation, trip, onStopsGenerated 
     };
   }, [origin, destination, currentLocation, trip, onStopsGenerated]);
 
-  return <div ref={mapContainer} style={{ height: '400px' }} />;
+  return (
+    <div className="map-container">
+      <div ref={mapContainer} style={{ height: '500px', width: '100%' }} />
+    </div>
+  );
 }
 
 export default TripMap;

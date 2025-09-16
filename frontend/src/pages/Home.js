@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './Home.css';
+import '../Home.css';
 
 function Home({ setActiveTab }) {
   const [driverName, setDriverName] = useState('');
@@ -25,7 +25,6 @@ function Home({ setActiveTab }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const tripData = {
       driver_name: driverName,
       departure_time: departureTime,
@@ -36,10 +35,9 @@ function Home({ setActiveTab }) {
     };
 
     try {
-      await axios.post('https://logtrack-demo-production.up.railway.app/api/trips/', tripData);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/trips/`, tripData);
       alert('Trip submitted successfully!');
       console.log('Trip submitted:', tripData);
-
       setDriverName('');
       setDepartureTime('');
       setOrigin('');
@@ -55,9 +53,8 @@ function Home({ setActiveTab }) {
   return (
     <div className="home-container">
       <h1 className="welcome-message">
-        Welcome, ready to log your trip? <span>⭐</span>
+        Welcome, ready to log your trip? <span> ⭐ </span>
       </h1>
-
       <div className="form-container">
         <h2 className="form-title">Enter Trip Details</h2>
         <form className="trip-form" onSubmit={handleSubmit}>
@@ -82,7 +79,6 @@ function Home({ setActiveTab }) {
               />
             </div>
           </div>
-
           <div className="form-row">
             <div className="form-group">
               <label>Origin</label>
@@ -105,7 +101,6 @@ function Home({ setActiveTab }) {
               />
             </div>
           </div>
-
           <div className="form-row">
             <div className="form-group">
               <label>Destination</label>
@@ -122,13 +117,11 @@ function Home({ setActiveTab }) {
               <div className={`location-indicator ${locationStatus}`}></div>
             </div>
           </div>
-
           <div className="form-row submit-row">
             <button type="submit">Submit</button>
           </div>
         </form>
       </div>
-
       <div className="contact-footer">
         <h3>Reach out... </h3>
         sizwe.ngwenya78@gmail.com
