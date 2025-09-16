@@ -16,7 +16,15 @@ Features
 
 🖼️ Screenshots
 Screenshots will be added once backend deployment is complete and dashboard data is live.
+<img width="1919" height="871" alt="Screenshot 2025-09-15 112022" src="https://github.com/user-attachments/assets/d58bee0e-27b2-48a2-807b-caace03b9f51" />
+<img width="1919" height="863" alt="Screenshot 2025-09-15 112044" src="https://github.com/user-attachments/assets/4a2fad41-0c09-49be-942b-59838c8602d4" />
 
+Future Updates
+Login feature to personalize each drivers information and trips.
+Proper functions as bugs still exist.
+Fix for remarks so that they are properly displayed .
+Better app functionality and UI upgrades.
+Fix for the current backend connection issues.
 
 Tech Stack 🛠️ 
 | Layer | Tools Used | 
