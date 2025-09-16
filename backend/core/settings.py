@@ -17,6 +17,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.vercel\.app$",
 ]
 
+CORS_ALLOW_CREDENTIALS = True  # If you're using cookies or auth headers
 
 INSTALLED_APPS = [
     'django.contrib.admin',
