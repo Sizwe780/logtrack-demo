@@ -14,11 +14,8 @@ ALLOWED_HOSTS = []
 
 # CORS settings to allow your Vercel frontend to connect
 CORS_ALLOWED_ORIGINS = [
-    "https://frontend-hal3oacl5-sizwe780s-projects.vercel.app",
-    "https://logtrack-frontend-seven.vercel.app",
-    "https://frontend-ranjbo9ki-sizwe780s-projects.vercel.app",
-    "https://frontend-pofpq0jin-sizwe780s-projects.vercel.app",
-    "https://frontend-apx6kiskd-sizwe780s-projects.vercel.app"
+    "https://*.vercel.app",
+    "https://logtrack-demo-production.up.railway.app",
 ]
 
 INSTALLED_APPS = [
