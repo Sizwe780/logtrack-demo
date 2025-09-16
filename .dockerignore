@@ -1,5 +1,11 @@
-env/
+.git
+.gitignore
 __pycache__/
 *.pyc
 *.db
-staticfiles/
+*.sqlite3
+env/
+venv/
+*.env
+.env
+staticfiles/ # Ensure this is included if you don't want it copied into the build context
