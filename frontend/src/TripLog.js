@@ -22,7 +22,9 @@ function TripLog({ trip, stopRemarks = [] }) {
       const row = [];
       const hourTime = new Date(currentTime + i * 60 * 60 * 1000);
       const status = 'Driving';
-      const location = trip.current_location || 'N/A';
+      const location = trip.current_location
+        ? `${trip.current_location.latitude}, ${trip.current_location.longitude}`
+        : 'N/A';
       row.push(hourTime.toLocaleString());
       row.push(status);
       row.push(location);
@@ -34,7 +36,9 @@ function TripLog({ trip, stopRemarks = [] }) {
       ['Date:', trip.date ? new Date(trip.date).toLocaleDateString() : 'N/A'],
       ['Departure Time:', trip.departure_time ? new Date(trip.departure_time).toLocaleString() : 'N/A'],
       ['Origin → Destination:', `${trip.origin} → ${trip.destination}`],
-      ['Current Location:', trip.current_location || 'N/A'],
+      ['Current Location:', trip.current_location
+        ? `${trip.current_location.latitude}, ${trip.current_location.longitude}`
+        : 'N/A'],
       ['Cycle Used:', trip.cycle_used !== null && trip.cycle_used !== undefined ? `${trip.cycle_used} hrs` : 'N/A'],
       ['City:', 'Nelson Mandela Bay Metropolitan Municipality'],
       ['Remarks:', remarks.join(' | ')],
