@@ -32,6 +32,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://frontend-hal3oacl5-sizwe780s-projects.vercel.app",
     "https://logtrack-frontend-seven.vercel.app"# Also good to include
     "https://frontend-ranjbo9ki-sizwe780s-projects.vercel.app"
+    "https://frontend-pofpq0jin-sizwe780s-projects.vercel.app"
 ]
 # Application definition
 
