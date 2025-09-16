@@ -13,10 +13,10 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"] # For debugging purposes, allows any host
 
 # CORS settings to allow your Vercel frontend to connect
-CORS_ALLOWED_ORIGINS = [
-    "https://*.vercel.app",
-    "https://logtrack-demo-production.up.railway.app",
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
 ]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
