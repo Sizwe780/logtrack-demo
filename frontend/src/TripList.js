@@ -61,9 +61,10 @@ function TripList() {
     }));
   }, []);
 
-  useEffect(() => {
+// Corrected code with the dependency array
+useEffect(() => {
     fetchTrips();
-  }, []);
+}, [fetchTrips]); // <-- This is the correct way
 
   return (
     <div className="container mx-auto p-4">
