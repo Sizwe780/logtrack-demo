@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-@e^3s!_e60%^y9e5$e959%75b08(4!%*599h9^66j*c04c$10p
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"] # For debugging purposes, allows any host
 
 # CORS settings to allow your Vercel frontend to connect
 CORS_ALLOWED_ORIGINS = [
