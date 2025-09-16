@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',  # Required for CORS
+    'corsheaders',  # Required for CORS
     'rest_framework', # Required for Django REST Framework
     'backend.trips',
 ]
@@ -92,6 +92,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles' # <<< ADDED THIS LINE
+STATIC_ROOT = BASE_DIR / 'staticfiles' # <<< THIS LINE IS CORRECTLY SET
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
