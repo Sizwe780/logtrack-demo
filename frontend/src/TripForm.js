@@ -8,7 +8,8 @@ function TripForm() {
   const [destination, setDestination] = useState('');
   const [date, setDate] = useState('');
   const [driverName, setDriverName] = useState('');
-  const [currentLocation, setCurrentLocation] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
   const [cycleUsed, setCycleUsed] = useState('');
   const [departureTime, setDepartureTime] = useState('');
 
@@ -16,7 +17,8 @@ function TripForm() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        setCurrentLocation(`${latitude},${longitude}`);
+        setLatitude(latitude);
+        setLongitude(longitude);
       },
       (err) => console.error('Geolocation error:', err)
     );
@@ -29,7 +31,10 @@ function TripForm() {
       destination,
       date,
       driver_name: driverName,
-      current_location: currentLocation,
+      current_location: {
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+      },
       cycle_used: Number(cycleUsed),
       departure_time: departureTime,
     };
@@ -39,7 +44,8 @@ function TripForm() {
       setDestination('');
       setDate('');
       setDriverName('');
-      setCurrentLocation('');
+      setLatitude('');
+      setLongitude('');
       setCycleUsed('');
       setDepartureTime('');
       alert('Trip submitted successfully!');
@@ -76,7 +82,7 @@ function TripForm() {
         <div className="form-row">
           <div className="form-group">
             <label>Current Location</label>
-            <input type="text" value={currentLocation} onChange={(e) => setCurrentLocation(e.target.value)} />
+            <input type="text" value={`${latitude},${longitude}`} readOnly />
           </div>
           <div className="form-group">
             <label>Cycle Used (hrs)</label>
