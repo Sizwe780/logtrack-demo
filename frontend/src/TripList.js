@@ -24,22 +24,7 @@ function TripList() {
     }
   };
 
-  const fetchTrips = async () => {
-    try {
-      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/trips/`);
-      const enrichedTrips = await Promise.all(
-        res.data.map(async (trip) => {
-          const originCoords = await geocodeLocation(trip.origin);
-          const destCoords = await geocodeLocation(trip.destination);
-          return { ...trip, originCoords, destCoords };
-        })
-      );
-      setTrips(enrichedTrips);
-    } catch (error) {
-      console.error('Failed to fetch trips:', error);
-    }
-  };
-
+  // Function to delete a trip
   const deleteTrip = async (id) => {
     try {
       await axios.delete(`${process.env.REACT_APP_API_URL}/api/trips/${id}/`);
@@ -61,10 +46,26 @@ function TripList() {
     }));
   }, []);
 
-// Corrected code with the dependency array
-useEffect(() => {
+  // Corrected useEffect with fetchTrips defined inside
+  useEffect(() => {
+    const fetchTrips = async () => { // fetchTrips is now defined INSIDE useEffect
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/trips/`);
+        const enrichedTrips = await Promise.all(
+          res.data.map(async (trip) => {
+            const originCoords = await geocodeLocation(trip.origin);
+            const destCoords = await geocodeLocation(trip.destination);
+            return { ...trip, originCoords, destCoords };
+          })
+        );
+        setTrips(enrichedTrips);
+      } catch (error) {
+        console.error('Failed to fetch trips:', error);
+      }
+    };
+    
     fetchTrips();
-}, [fetchTrips]); // <-- This is the correct way
+  }, []); // The empty dependency array means this effect runs only once on mount
 
   return (
     <div className="container mx-auto p-4">
