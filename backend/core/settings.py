@@ -13,6 +13,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"] # For debugging purposes, allows any host
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 # CORS settings to allow your Vercel frontend to connect
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.vercel\.app$",
