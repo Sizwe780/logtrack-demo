@@ -3,6 +3,7 @@ Django settings for backend project.
 """
 
 from pathlib import Path
+from corsheaders.defaults import default_headers
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -18,6 +19,11 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True  # If you're using cookies or auth headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'content-type',
+    'authorization',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
