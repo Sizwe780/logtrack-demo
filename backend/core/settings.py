@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',  # Required for CORS
+    'corsheaders',  # Required for CORS
     'rest_framework', # Required for Django REST Framework
     'backend.trips',
 ]
