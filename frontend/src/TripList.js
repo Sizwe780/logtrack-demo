@@ -76,7 +76,12 @@ function TripList() {
             <h3 className="text-xl font-semibold mb-2">{trip.origin} → {trip.destination}</h3>
             <p><strong>Driver:</strong> {trip.driver_name || 'N/A'}</p>
             <p><strong>Date:</strong> {trip.date || 'N/A'}</p>
-            <p><strong>Current Location:</strong> {trip.current_location || 'N/A'}</p>
+            <p>
+              <strong>Current Location:</strong>{' '}
+              {trip.current_location
+                ? `${trip.current_location.latitude}, ${trip.current_location.longitude}`
+                : 'N/A'}
+            </p>
             <p><strong>Cycle Used:</strong> {trip.cycle_used !== null && trip.cycle_used !== undefined ? `${trip.cycle_used} hrs` : 'N/A'}</p>
             <button
               onClick={() => deleteTrip(trip.id)}
